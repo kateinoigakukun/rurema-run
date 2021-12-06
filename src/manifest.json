@@ -1,0 +1,16 @@
+{
+  "name": "Rurema Run",
+  "description": "Execute example Ruby snippets in Rurema",
+  "version": "1.0",
+  "manifest_version": 2,
+  "content_scripts": [
+    {
+      "matches": [
+        "https://example.com/*",
+        "https://docs.ruby-lang.org/*"
+      ],
+      "js": ["index.ts"]
+    }
+  ],
+  "web_accessible_resources": ["ruby.wasm"]
+}

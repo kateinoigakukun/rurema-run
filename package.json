@@ -1,0 +1,27 @@
+{
+  "name": "rurema-run",
+  "version": "1.0.0",
+  "targets": {
+    "webext-dev": {
+      "sourceMap": {
+        "inline": true,
+        "inlineSources": true
+      }
+    },
+    "webext-prod": {}
+  },
+  "scripts": {
+    "start": "parcel src/manifest.json --host localhost --target webext-dev --config @parcel/config-webextension",
+    "build": "parcel build src/manifest.json --target webext-prod --config @parcel/config-webextension",
+    "build-dev": "parcel build src/manifest.json --target webext-dev --config @parcel/config-webextension"
+  },
+  "devDependencies": {
+    "parcel": "^2.0.1",
+    "@parcel/config-webextension": "^2.0.1",
+    "parcel-reporter-static-files-copy": "^1.3.2"
+  },
+  "dependencies": {
+    "@wasmer/wasi": "^0.12.0",
+    "@wasmer/wasmfs": "^0.12.0"
+  }
+}
