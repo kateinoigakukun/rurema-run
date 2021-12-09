@@ -4,12 +4,17 @@ import { WasmFs } from "@wasmer/wasmfs";
 class RubyCache {
   cache: WebAssembly.Module | null;
   fetchStarted: boolean;
-  deffereds: { resolve: Function; reject: Function }[];
+  onFetched: Promise<WebAssembly.Module>;
+  onFetchedResolve: (module: WebAssembly.Module) => void;
+  onFetchedReject: (error: Error) => void;
 
   constructor() {
     this.cache = null;
     this.fetchStarted = false;
-    this.deffereds = [];
+    this.onFetched = new Promise((resolve, reject) => {
+      this.onFetchedResolve = resolve;
+      this.onFetchedReject = reject;
+    });
   }
   async get(): Promise<WebAssembly.Module> {
     // fetch the wasm file if it's not in the cache, and return it.
@@ -17,9 +22,7 @@ class RubyCache {
     if (this.cache) {
       return this.cache;
     } else if (this.fetchStarted) {
-      return new Promise((resolve, reject) => {
-        this.deffereds.push({ resolve, reject });
-      });
+      return this.onFetched;
     } else {
       this.fetchStarted = true;
       try {
@@ -28,15 +31,12 @@ class RubyCache {
         const binary = await result.arrayBuffer();
         const module = await WebAssembly.compile(binary);
         this.cache = module;
-        this.deffereds.forEach(({ resolve }) => {
-          resolve(module);
-        });
+        this.onFetchedResolve(module);
+        return module;
       } catch (e) {
-        this.deffereds.forEach(({ reject }) => {
-          reject(e);
-        });
+	this.onFetchedReject(e);
+	throw e;
       }
-      return module;
     }
   }
 }
